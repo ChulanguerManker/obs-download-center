@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Centro de Descargas</title>
+<meta name="description" content="Programas y plugins gratuitos para OBS y streamers.">
+<link rel="icon" type="image/png" href="logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#07070d; --bg2:#0e0e1a; --card:#12121f; --card2:#181829;
+    --line:#26263d; --text:#ecebf7; --muted:#9a98b5;
+    --neon:#8b5cf6; --neon2:#22d3ee; --ok:#34d399; --warn:#fbbf24;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg); color:var(--text);
+    font-family:Inter,system-ui,sans-serif; line-height:1.55;
+    min-height:100vh; overflow-x:hidden;
+    background-image:
+      radial-gradient(900px 500px at 10% -10%, rgba(139,92,246,.18), transparent 60%),
+      radial-gradient(800px 500px at 100% 0%, rgba(34,211,238,.12), transparent 60%),
+      linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+    background-size:auto,auto,40px 40px,40px 40px;
+  }
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 16px}
+
+  /* Barra superior */
+  header{position:sticky;top:0;z-index:10;backdrop-filter:blur(12px);
+    background:rgba(7,7,13,.75);border-bottom:1px solid var(--line)}
+  .nav{display:flex;align-items:center;justify-content:space-between;height:64px;gap:12px}
+  .brand{display:flex;align-items:center;gap:10px;font-family:Rajdhani,sans-serif;
+    font-weight:700;font-size:1.25rem;letter-spacing:.5px}
+  .logo{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;
+    background:linear-gradient(135deg,var(--neon),var(--neon2));
+    box-shadow:0 0 18px rgba(139,92,246,.6);font-size:1.15rem;overflow:hidden}
+  .logo img{width:100%;height:100%;object-fit:contain}
+  .logo.has-img{width:46px;height:46px;background:none;box-shadow:none;border-radius:0;
+    filter:drop-shadow(0 0 8px rgba(139,92,246,.55));transition:transform .2s}
+  .brand:hover .logo.has-img{transform:rotate(-8deg) scale(1.08)}
+  .nav-links{display:flex;gap:8px}
+  .pill{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:999px;
+    border:1px solid var(--line);background:var(--bg2);font-size:.88rem;font-weight:500;
+    transition:.2s}
+  .pill:hover{border-color:var(--neon);box-shadow:0 0 14px rgba(139,92,246,.35)}
+  .pill.discord{background:#5865F2;border-color:#5865F2}
+  .pill.discord:hover{box-shadow:0 0 18px rgba(88,101,242,.6)}
+
+  /* Botones de redes */
+  .socials{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin-top:28px}
+  .social{--c:#8b5cf6;display:inline-flex;align-items:center;gap:10px;padding:12px 22px;border-radius:14px;
+    font:700 1.05rem Rajdhani,sans-serif;letter-spacing:1px;text-transform:uppercase;color:#fff;
+    background:color-mix(in srgb,var(--c) 22%,var(--bg2));border:1px solid color-mix(in srgb,var(--c) 70%,transparent);
+    transition:.2s}
+  .social:hover{background:var(--c);transform:translateY(-2px);box-shadow:0 0 24px var(--c)}
+  .social .ico{font-size:1.15rem;line-height:1}
+  .social.twitch{--c:#9146FF}
+  .social.youtube{--c:#FF0033}
+  .social.discord{--c:#5865F2}
+  .social.tiktok{--c:#25F4EE}
+  .nav-links .social{padding:7px 12px;font-size:.85rem;border-radius:10px}
+  .nav-links .social .txt{display:none}
+  footer .socials{margin:0 0 12px}
+  footer .social{padding:8px 14px;font-size:.85rem}
+
+  /* Portada */
+  .hero{padding:72px 0 40px;text-align:center}
+  .tag{display:inline-block;font-family:Rajdhani,sans-serif;font-weight:600;
+    letter-spacing:2px;text-transform:uppercase;font-size:.8rem;color:var(--neon2);
+    border:1px solid rgba(34,211,238,.35);padding:4px 12px;border-radius:999px;margin-bottom:18px}
+  h1{font-family:Rajdhani,sans-serif;font-weight:700;line-height:1.05;
+    font-size:clamp(2.2rem,6vw,4rem);letter-spacing:.5px}
+  h1 span{background:linear-gradient(90deg,var(--neon),var(--neon2));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    text-shadow:0 0 40px rgba(139,92,246,.35)}
+  .hero p{color:var(--muted);max-width:600px;margin:16px auto 0;font-size:1.05rem}
+
+  /* Filtros */
+  .tools{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center;margin:24px 0 22px}
+  .tabs{display:flex;gap:6px;flex-wrap:wrap}
+  .tab{cursor:pointer;font:600 .9rem Rajdhani,sans-serif;letter-spacing:1px;text-transform:uppercase;
+    padding:8px 16px;border-radius:10px;border:1px solid var(--line);background:var(--bg2);color:var(--muted);transition:.2s}
+  .tab:hover{color:var(--text)}
+  .tab.on{color:#fff;border-color:var(--neon);background:rgba(139,92,246,.18);box-shadow:0 0 14px rgba(139,92,246,.3)}
+  .search{flex:1;min-width:200px;max-width:320px;padding:10px 14px;border-radius:10px;
+    border:1px solid var(--line);background:var(--bg2);color:var(--text);font:inherit;outline:none}
+  .search:focus{border-color:var(--neon2)}
+
+  /* Tarjetas */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px;padding-bottom:40px}
+  .card{position:relative;background:linear-gradient(180deg,var(--card2),var(--card));
+    border:1px solid var(--line);border-radius:var(--radius);padding:22px;display:flex;flex-direction:column;
+    gap:14px;transition:transform .2s,border-color .2s,box-shadow .2s;overflow:hidden}
+  .card::before{content:"";position:absolute;inset:0 0 auto 0;height:3px;background:var(--accent)}
+  .card:hover{transform:translateY(-4px);border-color:var(--accent);
+    box-shadow:0 10px 40px -10px var(--accent)}
+  .top{display:flex;gap:14px;align-items:center}
+  .icon{width:54px;height:54px;flex:none;border-radius:14px;display:grid;place-items:center;font-size:1.6rem;
+    background:color-mix(in srgb,var(--accent) 20%,transparent);border:1px solid color-mix(in srgb,var(--accent) 50%,transparent)}
+  .icon img{width:100%;height:100%;object-fit:cover;border-radius:13px}
+  .card h3{font-family:Rajdhani,sans-serif;font-size:1.45rem;font-weight:700;line-height:1.1}
+  .type{font:600 .72rem Rajdhani,sans-serif;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent)}
+  .desc{color:var(--muted);font-size:.94rem;flex:1}
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chip{font-size:.75rem;padding:3px 9px;border-radius:999px;background:var(--bg);border:1px solid var(--line);color:var(--muted)}
+  .meta{display:flex;justify-content:space-between;font-size:.8rem;color:var(--muted);
+    border-top:1px dashed var(--line);padding-top:12px;gap:8px;flex-wrap:wrap}
+  .meta b{color:var(--text);font-weight:600}
+  .ver{color:var(--ok)}
+  .actions{display:flex;gap:8px}
+  .btn{flex:1;display:inline-flex;justify-content:center;align-items:center;gap:8px;padding:12px;
+    border-radius:12px;font:700 1rem Rajdhani,sans-serif;letter-spacing:1px;text-transform:uppercase;
+    background:var(--accent);color:#fff;border:none;cursor:pointer;transition:.2s}
+  .btn:hover{filter:brightness(1.15);box-shadow:0 0 22px var(--accent)}
+  .btn.ghost{flex:none;background:transparent;border:1px solid var(--line);color:var(--muted);padding:12px 14px}
+  .btn.ghost:hover{color:var(--text);border-color:var(--accent);box-shadow:none}
+  .empty{grid-column:1/-1;text-align:center;color:var(--muted);padding:40px}
+
+  /* Bloque Discord */
+  .cta{margin:10px 0 60px;padding:32px;border-radius:20px;text-align:center;
+    background:linear-gradient(135deg,rgba(88,101,242,.25),rgba(139,92,246,.15));border:1px solid rgba(88,101,242,.45)}
+  .cta h2{font-family:Rajdhani,sans-serif;font-size:1.8rem;margin-bottom:6px}
+  .cta p{color:var(--muted);margin-bottom:18px}
+
+  .note{font-size:.82rem;color:var(--muted);background:var(--bg2);border:1px solid var(--line);
+    border-left:3px solid var(--warn);border-radius:10px;padding:12px 14px;margin-bottom:40px}
+  footer{border-top:1px solid var(--line);padding:24px 0;color:var(--muted);font-size:.85rem;text-align:center}
+  footer a{color:var(--neon2)}
+
+  @media (max-width:600px){
+    .social{padding:10px 16px;font-size:.95rem}
+    .hero{padding:48px 0 24px}
+    .grid{grid-template-columns:1fr}
+    .search{max-width:none}
+    .cta{padding:24px 18px}
+  }
+</style>
+</head>
+<body>
+
+<script>
+/* =====================================================================
+   CONFIGURACIÓN — solo tienes que editar esta parte
+   ===================================================================== */
+const CONFIG = {
+  nombre:   "Chulanguermanker",                       // Tu nombre o marca
+  github:   "fjfernandezvalverde-debug",              // Tu usuario de GitHub
+  logo:     "logo.png",                           // Tu icono de patata (si no está, sale 🥔)
+
+  // Redes sociales (deja "" en las que no quieras mostrar)
+  twitch:   "",                                       // ← tu canal de Twitch, p. ej. "https://www.twitch.tv/..."
+  youtube:  "",                                       // ← tu canal de YouTube, p. ej. "https://www.youtube.com/@..."
+  discord:  "",                                       // ← invitación a tu Discord, p. ej. "https://discord.gg/..."
+  tiktok:   "https://www.tiktok.com/@chulanguermanker"
+};
+
+/* Tus programas y plugins.
+   - repo:    nombre del repositorio en GitHub donde subes las versiones (Releases)
+   - archivo: nombre EXACTO del .exe/.zip que subes en cada versión (usa siempre el mismo)
+   - tipo:    "programa" o "plugin"
+   - imagen:  (opcional) ruta a un icono, p. ej. "img/camlibre.png". Si no, usa el emoji.
+   - url:     (opcional) enlace de descarga propio si no usas GitHub Releases
+   - tutorial:(opcional) enlace a un vídeo tutorial
+*/
+const PRODUCTOS = [
+  {
+    nombre: "CamLibre",
+    tipo: "programa",
+    descripcion: "Cámara con avatar 3D para tus directos y vídeos. Añádela a OBS y dale vida a tu stream sin webcam.",
+    repo: "camlibre",
+    archivo: "CamLibre-Setup.exe",
+    icono: "🎥",
+    color: "#8b5cf6",
+    etiquetas: ["Windows", "Avatar 3D", "OBS"],
+    tutorial: ""
+  },
+  {
+    nombre: "Twitch Activity",
+    tipo: "programa",
+    descripcion: "Muestra en pantalla la actividad de tu canal de Twitch durante el directo.",
+    repo: "twitch-activity",
+    archivo: "TwitchActivity-Setup.exe",
+    icono: "💜",
+    color: "#a855f7",
+    etiquetas: ["Windows", "Twitch", "Overlay"],
+    tutorial: ""
+  },
+  {
+    nombre: "TransitionRandom",
+    tipo: "plugin",
+    descripcion: "Transiciones aleatorias entre escenas para que tu directo nunca se vea igual.",
+    repo: "transition-random",
+    archivo: "TransitionRandom.zip",
+    icono: "🎲",
+    color: "#22d3ee",
+    etiquetas: ["OBS", "Transiciones"],
+    tutorial: ""
+  }
+];
+/* ===================================================================== */
+</script>
+
+<header>
+  <div class="wrap nav">
+    <a class="brand" href="#"><span class="logo" id="logo">🥔</span><span id="brandName">Downloads</span></a>
+    <nav class="nav-links" id="navSocial"></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="hero">
+    <div class="tag">Gratis · Para streamers</div>
+    <h1>Centro de <span>Descargas</span></h1>
+    <p>Programas y plugins para OBS hechos por <b id="heroName"></b>. Descarga siempre la última versión con un clic.</p>
+    <div class="socials" id="heroSocial"></div>
+  </section>
+
+  <div class="tools">
+    <div class="tabs" role="tablist">
+      <button class="tab on" data-f="todos">Todo</button>
+      <button class="tab" data-f="programa">Programas</button>
+      <button class="tab" data-f="plugin">Plugins OBS</button>
+    </div>
+    <input class="search" id="q" type="search" placeholder="Buscar…" aria-label="Buscar">
+  </div>
+
+  <section class="grid" id="grid"></section>
+
+  <div class="note">
+    ⚠️ Windows puede mostrar el aviso <b>“Windows protegió su PC”</b> al abrir programas nuevos sin firma digital.
+    Pulsa <b>Más información → Ejecutar de todas formas</b>. Descarga solo desde esta página o desde mi Discord oficial.
+  </div>
+
+  <section class="cta">
+    <h2>¿Dudas o ideas? Únete al Discord</h2>
+    <p>Avisos de nuevas versiones, soporte y sugerencias para los próximos programas.</p>
+    <a class="btn" id="ctaDiscord" style="--accent:#5865F2;max-width:280px;margin:0 auto" target="_blank" rel="noopener">Entrar al Discord</a>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap"><div class="socials" id="footSocial"></div>© <span id="year"></span> <span id="footName"></span> · Alojado gratis en
+    <a href="https://pages.github.com" target="_blank" rel="noopener">GitHub Pages</a></div>
+</footer>
+
+<script>
+(function(){
+  const $ = s => document.querySelector(s);
+  const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  const configurado = CONFIG.github && CONFIG.github !== "TUUSUARIO";
+
+  // Cabecera y enlaces
+  $("#brandName").textContent = CONFIG.nombre;
+  if (CONFIG.logo) {
+    const img = new Image();
+    img.alt = CONFIG.nombre;
+    img.onload = () => { const l = $("#logo"); l.textContent = ""; l.classList.add("has-img"); l.appendChild(img); };
+    img.src = CONFIG.logo;
+  }
+  $("#heroName").textContent = CONFIG.nombre;
+  $("#footName").textContent = CONFIG.nombre;
+  $("#year").textContent = new Date().getFullYear();
+  const setLink = (el, url) => { if (url) el.href = url; else el.style.display = "none"; };
+  setLink($("#ctaDiscord"), CONFIG.discord);
+  if (!CONFIG.discord) $(".cta").style.display = "none";
+
+  // Botones de redes sociales (cabecera, portada y pie)
+  const REDES = [
+    { k: "twitch",  nombre: "Twitch",  ico: "🎮" },
+    { k: "youtube", nombre: "YouTube", ico: "▶" },
+    { k: "discord", nombre: "Discord", ico: "💬" },
+    { k: "tiktok",  nombre: "TikTok",  ico: "🎵" }
+  ].filter(r => CONFIG[r.k]);
+  const botones = REDES.map(r =>
+    `<a class="social ${r.k}" href="${esc(CONFIG[r.k])}" target="_blank" rel="noopener" title="${r.nombre}">
+       <span class="ico">${r.ico}</span><span class="txt">${r.nombre}</span></a>`).join("");
+  ["#navSocial", "#heroSocial", "#footSocial"].forEach(s => $(s).innerHTML = botones);
+
+  const descarga = p => p.url || `https://github.com/${CONFIG.github}/${p.repo}/releases/latest/download/${p.archivo}`;
+  const versiones = p => `https://github.com/${CONFIG.github}/${p.repo}/releases`;
+
+  function tarjeta(p, i){
+    const icono = p.imagen ? `<img src="${esc(p.imagen)}" alt="">` : esc(p.icono || "📦");
+    const chips = (p.etiquetas || []).map(t => `<span class="chip">${esc(t)}</span>`).join("");
+    const tut = p.tutorial ? `<a class="btn ghost" href="${esc(p.tutorial)}" target="_blank" rel="noopener" title="Ver tutorial">▶</a>` : "";
+    const hist = p.url ? "" : `<a class="btn ghost" href="${esc(versiones(p))}" target="_blank" rel="noopener" title="Versiones anteriores">⟲</a>`;
+    return `
+    <article class="card" style="--accent:${esc(p.color || "#8b5cf6")}" data-tipo="${esc(p.tipo)}" data-txt="${esc((p.nombre+" "+p.descripcion+" "+(p.etiquetas||[]).join(" ")).toLowerCase())}">
+      <div class="top">
+        <div class="icon">${icono}</div>
+        <div><div class="type">${p.tipo === "plugin" ? "Plugin OBS" : "Programa"}</div><h3>${esc(p.nombre)}</h3></div>
+      </div>
+      <p class="desc">${esc(p.descripcion)}</p>
+      <div class="chips">${chips}</div>
+      <div class="meta">
+        <span>Versión: <b class="ver" id="v${i}">${configurado ? "…" : "—"}</b></span>
+        <span>Descargas: <b id="d${i}">${configurado ? "…" : "—"}</b></span>
+      </div>
+      <div class="actions">
+        <a class="btn" href="${esc(descarga(p))}">⬇ Descargar</a>${tut}${hist}
+      </div>
+    </article>`;
+  }
+
+  $("#grid").innerHTML = PRODUCTOS.map(tarjeta).join("") + `<p class="empty" id="empty" hidden>No hay nada con ese nombre.</p>`;
+
+  // Versión y número de descargas en directo desde GitHub
+  if (configurado){
+    PRODUCTOS.forEach((p, i) => {
+      if (p.url) { $("#v"+i).textContent = "—"; $("#d"+i).textContent = "—"; return; }
+      fetch(`https://api.github.com/repos/${CONFIG.github}/${p.repo}/releases`)
+        .then(r => r.ok ? r.json() : Promise.reject())
+        .then(rel => {
+          const ultima = rel.find(r => !r.draft && !r.prerelease) || rel[0];
+          $("#v"+i).textContent = ultima ? ultima.tag_name : "sin publicar";
+          const total = rel.reduce((s, r) => s + (r.assets || []).reduce((a, x) => a + x.download_count, 0), 0);
+          $("#d"+i).textContent = total.toLocaleString("es-ES");
+        })
+        .catch(() => { $("#v"+i).textContent = "próximamente"; $("#d"+i).textContent = "—"; });
+    });
+  }
+
+  // Filtros y buscador
+  let filtro = "todos";
+  function aplicar(){
+    const q = $("#q").value.trim().toLowerCase();
+    let visibles = 0;
+    document.querySelectorAll(".card").forEach(c => {
+      const ok = (filtro === "todos" || c.dataset.tipo === filtro) && c.dataset.txt.includes(q);
+      c.hidden = !ok; if (ok) visibles++;
+    });
+    $("#empty").hidden = visibles > 0;
+  }
+  document.querySelectorAll(".tab").forEach(b => b.addEventListener("click", () => {
+    document.querySelectorAll(".tab").forEach(x => x.classList.remove("on"));
+    b.classList.add("on"); filtro = b.dataset.f; aplicar();
+  }));
+  $("#q").addEventListener("input", aplicar);
+})();
+</script>
+</body>
+</html>
