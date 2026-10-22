@@ -140,7 +140,21 @@
   footer{border-top:1px solid var(--line);padding:24px 0;color:var(--muted);font-size:.85rem;text-align:center}
   footer a{color:var(--neon2)}
 
+  /* Selector de idioma */
+  .nav-right{display:flex;align-items:center;gap:10px}
+  .lang{display:flex;gap:4px;padding:3px;border-radius:10px;background:var(--bg2);border:1px solid var(--line)}
+  .lang button{display:flex;align-items:center;gap:6px;padding:5px 8px;border:none;border-radius:7px;background:none;
+    color:var(--muted);font:700 .78rem Rajdhani,sans-serif;letter-spacing:1px;cursor:pointer;transition:.2s}
+  .lang button svg{width:20px;height:14px;border-radius:2px;display:block;opacity:.55;transition:.2s}
+  .lang button:hover svg{opacity:.85}
+  .lang button.on{background:rgba(139,92,246,.22);color:#fff;box-shadow:0 0 10px rgba(139,92,246,.35)}
+  .lang button.on svg{opacity:1}
+
   @media (max-width:600px){
+    .nav-links{display:none}
+    .brand{font-size:1.05rem;min-width:0}
+    .brand span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .lang button{padding:5px 6px;gap:4px}
     .social{padding:10px 16px;font-size:.95rem}
     .hero{padding:48px 0 24px}
     .grid{grid-template-columns:1fr}
@@ -175,12 +189,14 @@ const CONFIG = {
    - version: versión actual (si hay una Release en GitHub, se usa la de GitHub)
    - url:     (opcional) enlace de descarga propio si no usas GitHub Releases
    - tutorial:(opcional) enlace a un vídeo tutorial
+   - descripcion_en / etiquetas_en: textos en inglés (si faltan, se usan los de español)
 */
 const PRODUCTOS = [
   {
     nombre: "CamLibre",
     tipo: "programa",
     descripcion: "Cámara con avatar 3D para tus directos y vídeos. Añádela a OBS y dale vida a tu stream sin webcam.",
+    descripcion_en: "3D avatar camera for your streams and videos. Add it to OBS and bring your stream to life without a webcam.",
     repo: "camlibre-descargas",
     archivo: "CamLibre-Setup.exe",
     icono: "🎥",
@@ -188,12 +204,14 @@ const PRODUCTOS = [
     version: "v1.7.1",
     color: "#8b5cf6",
     etiquetas: ["Windows", "Avatar 3D", "OBS"],
+    etiquetas_en: ["Windows", "3D Avatar", "OBS"],
     tutorial: ""
   },
   {
     nombre: "Twitch Activity",
     tipo: "programa",
     descripcion: "Muestra en pantalla la actividad de tu canal de Twitch durante el directo.",
+    descripcion_en: "Shows your Twitch channel activity on screen while you're live.",
     repo: "twitchactivity-descargas",
     archivo: "TwitchActivity-Setup.exe",
     icono: "💜",
@@ -207,6 +225,7 @@ const PRODUCTOS = [
     nombre: "TransitionRandom",
     tipo: "plugin",
     descripcion: "Transiciones aleatorias entre escenas para que tu directo nunca se vea igual.",
+    descripcion_en: "Random transitions between scenes so your stream never looks the same.",
     repo: "transitionrandom-descargas",
     archivo: "TransitionRandom.zip",
     icono: "🎲",
@@ -214,6 +233,7 @@ const PRODUCTOS = [
     version: "v0.2.5",
     color: "#22d3ee",
     etiquetas: ["OBS", "Transiciones"],
+    etiquetas_en: ["OBS", "Transitions"],
     tutorial: ""
   }
 ];
@@ -223,51 +243,105 @@ const PRODUCTOS = [
 <header>
   <div class="wrap nav">
     <a class="brand" href="#"><span class="logo" id="logo">🥔</span><span id="brandName">Downloads</span></a>
-    <nav class="nav-links" id="navSocial"></nav>
+    <div class="nav-right">
+      <nav class="nav-links" id="navSocial"></nav>
+      <div class="lang" role="group" aria-label="Idioma / Language">
+        <button type="button" data-lang="es" title="Español">
+          <svg viewBox="0 0 3 2" aria-hidden="true"><rect width="3" height="2" fill="#AA151B"/><rect y=".5" width="3" height="1" fill="#F1BF00"/></svg>ES</button>
+        <button type="button" data-lang="en" title="English">
+          <svg viewBox="0 0 60 30" aria-hidden="true"><clipPath id="ukS"><path d="M0,0v30h60V0z"/></clipPath><clipPath id="ukT"><path d="M30,15h30v15zv15H0zH0V0zV0h30z"/></clipPath><g clip-path="url(#ukS)"><path d="M0,0v30h60V0z" fill="#012169"/><path d="M0,0L60,30M60,0L0,30" stroke="#fff" stroke-width="6"/><path d="M0,0L60,30M60,0L0,30" clip-path="url(#ukT)" stroke="#C8102E" stroke-width="4"/><path d="M30,0v30M0,15h60" stroke="#fff" stroke-width="10"/><path d="M30,0v30M0,15h60" stroke="#C8102E" stroke-width="6"/></g></svg>EN</button>
+      </div>
+    </div>
   </div>
 </header>
 
 <main class="wrap">
   <section class="hero">
-    <div class="tag">Gratis · Para streamers</div>
-    <h1>Centro de <span>Descargas</span></h1>
-    <p>Programas y plugins para OBS hechos por <b id="heroName"></b>. Descarga siempre la última versión con un clic.</p>
+    <div class="tag" data-i18n="tag">Gratis · Para streamers</div>
+    <h1 data-i18n="title">Centro de <span>Descargas</span></h1>
+    <p data-i18n="intro">Programas y plugins para OBS hechos por <b class="nm"></b>. Descarga siempre la última versión con un clic.</p>
     <div class="socials" id="heroSocial"></div>
   </section>
 
   <div class="tools">
     <div class="tabs" role="tablist">
-      <button class="tab on" data-f="todos">Todo</button>
-      <button class="tab" data-f="programa">Programas</button>
-      <button class="tab" data-f="plugin">Plugins OBS</button>
+      <button class="tab on" data-f="todos" data-i18n="all">Todo</button>
+      <button class="tab" data-f="programa" data-i18n="programs">Programas</button>
+      <button class="tab" data-f="plugin" data-i18n="plugins">Plugins OBS</button>
     </div>
     <input class="search" id="q" type="search" placeholder="Buscar…" aria-label="Buscar">
   </div>
 
   <section class="grid" id="grid"></section>
 
-  <div class="note">
+  <div class="note" data-i18n="note">
     ⚠️ Windows puede mostrar el aviso <b>“Windows protegió su PC”</b> al abrir programas nuevos sin firma digital.
     Pulsa <b>Más información → Ejecutar de todas formas</b>. Descarga solo desde esta página o desde mi Discord oficial.
   </div>
 
   <section class="cta">
-    <h2>¿Dudas o ideas? Únete al Discord</h2>
-    <p>Avisos de nuevas versiones, soporte y sugerencias para los próximos programas.</p>
-    <a class="btn" id="ctaDiscord" style="--accent:#5865F2;max-width:280px;margin:0 auto" target="_blank" rel="noopener">Entrar al Discord</a>
+    <h2 data-i18n="ctaTitle">¿Dudas o ideas? Únete al Discord</h2>
+    <p data-i18n="ctaText">Avisos de nuevas versiones, soporte y sugerencias para los próximos programas.</p>
+    <a class="btn" id="ctaDiscord" style="--accent:#5865F2;max-width:280px;margin:0 auto" target="_blank" rel="noopener" data-i18n="ctaBtn">Entrar al Discord</a>
   </section>
 </main>
 
 <footer>
-  <div class="wrap"><div class="socials" id="footSocial"></div>© <span id="year"></span> <span id="footName"></span> · Alojado gratis en
+  <div class="wrap"><div class="socials" id="footSocial"></div>© <span id="year"></span> <span class="nm"></span> · <span data-i18n="hosted">Alojado gratis en</span>
     <a href="https://pages.github.com" target="_blank" rel="noopener">GitHub Pages</a></div>
 </footer>
 
 <script>
 (function(){
   const $ = s => document.querySelector(s);
+  const $$ = s => document.querySelectorAll(s);
   const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
   const configurado = CONFIG.github && CONFIG.github !== "TUUSUARIO";
+
+  /* ---------- Textos en español e inglés ---------- */
+  const TXT = {
+    es: {
+      htmlTitle: "Centro de Descargas",
+      tag: "Gratis · Para streamers",
+      title: "Centro de <span>Descargas</span>",
+      intro: 'Programas y plugins para OBS hechos por <b class="nm"></b>. Descarga siempre la última versión con un clic.',
+      all: "Todo", programs: "Programas", plugins: "Plugins OBS",
+      search: "Buscar…",
+      program: "Programa", plugin: "Plugin OBS",
+      soon: "Próximamente", updated: "Actualizado", downloads: "Descargas",
+      download: "⬇ Descargar", tutorial: "Ver tutorial", history: "Versiones anteriores",
+      empty: "No hay nada con ese nombre.",
+      note: '⚠️ Windows puede mostrar el aviso <b>“Windows protegió su PC”</b> al abrir programas nuevos sin firma digital. Pulsa <b>Más información → Ejecutar de todas formas</b>. Descarga solo desde esta página o desde mi Discord oficial.',
+      ctaTitle: "¿Dudas o ideas? Únete al Discord",
+      ctaText: "Avisos de nuevas versiones, soporte y sugerencias para los próximos programas.",
+      ctaBtn: "Entrar al Discord",
+      hosted: "Alojado gratis en",
+      locale: "es-ES"
+    },
+    en: {
+      htmlTitle: "Download Center",
+      tag: "Free · For streamers",
+      title: "Download <span>Center</span>",
+      intro: 'Programs and OBS plugins made by <b class="nm"></b>. Always get the latest version in one click.',
+      all: "All", programs: "Programs", plugins: "OBS Plugins",
+      search: "Search…",
+      program: "Program", plugin: "OBS Plugin",
+      soon: "Coming soon", updated: "Updated", downloads: "Downloads",
+      download: "⬇ Download", tutorial: "Watch tutorial", history: "Previous versions",
+      empty: "Nothing matches that name.",
+      note: '⚠️ Windows may show a <b>“Windows protected your PC”</b> warning when opening new programs without a digital signature. Click <b>More info → Run anyway</b>. Only download from this page or my official Discord.',
+      ctaTitle: "Questions or ideas? Join the Discord",
+      ctaText: "New version announcements, support and suggestions for upcoming programs.",
+      ctaBtn: "Join the Discord",
+      hosted: "Hosted for free on",
+      locale: "en-GB"
+    }
+  };
+
+  // Idioma: el elegido antes, si no el del navegador
+  let lang = "es";
+  try { lang = localStorage.getItem("lang") || ""; } catch (e) { lang = ""; }
+  if (!TXT[lang]) lang = (navigator.language || "es").toLowerCase().startsWith("es") ? "es" : "en";
 
   // Cabecera y enlaces
   $("#brandName").textContent = CONFIG.nombre;
@@ -277,8 +351,6 @@ const PRODUCTOS = [
     img.onload = () => { const l = $("#logo"); l.textContent = ""; l.classList.add("has-img"); l.appendChild(img); };
     img.src = CONFIG.logo;
   }
-  $("#heroName").textContent = CONFIG.nombre;
-  $("#footName").textContent = CONFIG.nombre;
   $("#year").textContent = new Date().getFullYear();
   const setLink = (el, url) => { if (url) el.href = url; else el.style.display = "none"; };
   setLink($("#ctaDiscord"), CONFIG.discord);
@@ -296,39 +368,84 @@ const PRODUCTOS = [
        <span class="ico">${r.ico}</span><span class="txt">${r.nombre}</span></a>`).join("");
   ["#navSocial", "#heroSocial", "#footSocial"].forEach(s => $(s).innerHTML = botones);
 
-  // El botón apunta a la página de versiones y, en cuanto GitHub responde, al instalador de la última versión
-  const descarga = p => p.url || `https://github.com/${CONFIG.github}/${p.repo}/releases/latest`;
+  // Datos de GitHub (se guardan para poder cambiar de idioma sin volver a pedirlos)
+  const info = PRODUCTOS.map(() => ({}));
+  const descarga = (p, i) => info[i].url || p.url || `https://github.com/${CONFIG.github}/${p.repo}/releases/latest`;
   const versiones = p => `https://github.com/${CONFIG.github}/${p.repo}/releases`;
+  const textos = p => ({
+    desc: (lang === "en" && p.descripcion_en) || p.descripcion,
+    tags: (lang === "en" && p.etiquetas_en) || p.etiquetas || []
+  });
 
   function tarjeta(p, i){
+    const t = TXT[lang], d = info[i], tx = textos(p);
     const icono = p.imagen ? `<img src="${esc(p.imagen)}" alt="">` : esc(p.icono || "📦");
-    const chips = (p.etiquetas || []).map(t => `<span class="chip">${esc(t)}</span>`).join("");
-    const tut = p.tutorial ? `<a class="btn ghost" href="${esc(p.tutorial)}" target="_blank" rel="noopener" title="Ver tutorial">▶</a>` : "";
-    const hist = p.url ? "" : `<a class="btn ghost" href="${esc(versiones(p))}" target="_blank" rel="noopener" title="Versiones anteriores">⟲</a>`;
+    const chips = tx.tags.map(x => `<span class="chip">${esc(x)}</span>`).join("");
+    const tut = p.tutorial ? `<a class="btn ghost" href="${esc(p.tutorial)}" target="_blank" rel="noopener" title="${t.tutorial}">▶</a>` : "";
+    const hist = p.url ? "" : `<a class="btn ghost" href="${esc(versiones(p))}" target="_blank" rel="noopener" title="${t.history}">⟲</a>`;
+    const ver = d.tag || p.version;
+    const fecha = d.fecha ? new Date(d.fecha).toLocaleDateString(t.locale) : "—";
+    const total = d.total != null ? d.total.toLocaleString(t.locale) : (configurado && !p.url && !d.error ? "…" : "—");
     return `
-    <article class="card" style="--accent:${esc(p.color || "#8b5cf6")}" data-tipo="${esc(p.tipo)}" data-txt="${esc((p.nombre+" "+p.descripcion+" "+(p.etiquetas||[]).join(" ")).toLowerCase())}">
+    <article class="card" style="--accent:${esc(p.color || "#8b5cf6")}" data-tipo="${esc(p.tipo)}" data-txt="${esc([p.nombre, p.descripcion, p.descripcion_en, ...(p.etiquetas||[]), ...(p.etiquetas_en||[])].join(" ").toLowerCase())}">
       <div class="top">
         <div class="icon${p.imagen ? " has-img" : ""}">${icono}</div>
-        <div><div class="type">${p.tipo === "plugin" ? "Plugin OBS" : "Programa"}</div><h3>${esc(p.nombre)}<span class="vbadge${p.version ? "" : " soon"}" id="v${i}">${esc(p.version || "Próximamente")}</span></h3></div>
+        <div><div class="type">${p.tipo === "plugin" ? t.plugin : t.program}</div><h3>${esc(p.nombre)}<span class="vbadge${ver ? "" : " soon"}">${esc(ver || t.soon)}</span></h3></div>
       </div>
-      <p class="desc">${esc(p.descripcion)}</p>
+      <p class="desc">${esc(tx.desc)}</p>
       <div class="chips">${chips}</div>
       <div class="meta">
-        <span>Actualizado: <b id="f${i}">—</b></span>
-        <span>Descargas: <b id="d${i}">${configurado ? "…" : "—"}</b></span>
+        <span>${t.updated}: <b>${fecha}</b></span>
+        <span>${t.downloads}: <b>${total}</b></span>
       </div>
       <div class="actions">
-        <a class="btn" id="b${i}" href="${esc(descarga(p))}">⬇ Descargar</a>${tut}${hist}
+        <a class="btn" href="${esc(descarga(p, i))}">${t.download}</a>${tut}${hist}
       </div>
     </article>`;
   }
 
-  $("#grid").innerHTML = PRODUCTOS.map(tarjeta).join("") + `<p class="empty" id="empty" hidden>No hay nada con ese nombre.</p>`;
+  function pintar(){
+    $("#grid").innerHTML = PRODUCTOS.map(tarjeta).join("") + `<p class="empty" id="empty" hidden>${TXT[lang].empty}</p>`;
+    aplicar();
+  }
 
-  // Versión y número de descargas en directo desde GitHub
+  function idioma(l){
+    lang = l;
+    try { localStorage.setItem("lang", l); } catch (e) {}
+    const t = TXT[l];
+    document.documentElement.lang = l;
+    document.title = t.htmlTitle;
+    $$("[data-i18n]").forEach(el => { el.innerHTML = t[el.dataset.i18n]; });
+    $$(".nm").forEach(el => el.textContent = CONFIG.nombre);
+    $("#q").placeholder = t.search; $("#q").setAttribute("aria-label", t.search);
+    $$(".lang button").forEach(b => b.classList.toggle("on", b.dataset.lang === l));
+    pintar();
+  }
+  $$(".lang button").forEach(b => b.addEventListener("click", () => idioma(b.dataset.lang)));
+
+  // Filtros y buscador
+  let filtro = "todos";
+  function aplicar(){
+    const q = $("#q").value.trim().toLowerCase();
+    let visibles = 0;
+    $$(".card").forEach(c => {
+      const ok = (filtro === "todos" || c.dataset.tipo === filtro) && c.dataset.txt.includes(q);
+      c.hidden = !ok; if (ok) visibles++;
+    });
+    $("#empty").hidden = visibles > 0;
+  }
+  $$(".tab").forEach(b => b.addEventListener("click", () => {
+    $$(".tab").forEach(x => x.classList.remove("on"));
+    b.classList.add("on"); filtro = b.dataset.f; aplicar();
+  }));
+  $("#q").addEventListener("input", aplicar);
+
+  idioma(lang);
+
+  // Versión, fecha, descargas e instalador en directo desde GitHub
   if (configurado){
     PRODUCTOS.forEach((p, i) => {
-      if (p.url) { $("#d"+i).textContent = "—"; return; }
+      if (p.url) return;
       fetch(`https://api.github.com/repos/${CONFIG.github}/${p.repo}/releases`)
         .then(r => r.ok ? r.json() : Promise.reject())
         .then(rel => {
@@ -336,33 +453,16 @@ const PRODUCTOS = [
           if (ultima) {
             const assets = ultima.assets || [];
             const a = assets.find(x => x.name === p.archivo) || assets.find(x => /\.(exe|msi|zip)$/i.test(x.name)) || assets[0];
-            if (a) $("#b"+i).href = a.browser_download_url;
-            $("#v"+i).textContent = ultima.tag_name; $("#v"+i).classList.remove("soon");
-            $("#f"+i).textContent = new Date(ultima.published_at).toLocaleDateString("es-ES");
+            if (a) info[i].url = a.browser_download_url;
+            info[i].tag = ultima.tag_name;
+            info[i].fecha = ultima.published_at;
           }
-          const total = rel.reduce((s, r) => s + (r.assets || []).reduce((a, x) => a + x.download_count, 0), 0);
-          $("#d"+i).textContent = total.toLocaleString("es-ES");
+          info[i].total = rel.reduce((s, r) => s + (r.assets || []).reduce((a, x) => a + x.download_count, 0), 0);
         })
-        .catch(() => { $("#d"+i).textContent = "—"; });
+        .catch(() => { info[i].error = true; })
+        .finally(pintar);
     });
   }
-
-  // Filtros y buscador
-  let filtro = "todos";
-  function aplicar(){
-    const q = $("#q").value.trim().toLowerCase();
-    let visibles = 0;
-    document.querySelectorAll(".card").forEach(c => {
-      const ok = (filtro === "todos" || c.dataset.tipo === filtro) && c.dataset.txt.includes(q);
-      c.hidden = !ok; if (ok) visibles++;
-    });
-    $("#empty").hidden = visibles > 0;
-  }
-  document.querySelectorAll(".tab").forEach(b => b.addEventListener("click", () => {
-    document.querySelectorAll(".tab").forEach(x => x.classList.remove("on"));
-    b.classList.add("on"); filtro = b.dataset.f; aplicar();
-  }));
-  $("#q").addEventListener("input", aplicar);
 })();
 </script>
 </body>
