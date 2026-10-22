@@ -169,7 +169,7 @@ const CONFIG = {
 
 /* Tus programas y plugins.
    - repo:    nombre del repositorio en GitHub donde subes las versiones (Releases)
-   - archivo: nombre EXACTO del .exe/.zip que subes en cada versión (usa siempre el mismo)
+   - archivo: (opcional) nombre preferido del instalador; si no coincide, se usa el primer .exe/.msi/.zip de la versión
    - tipo:    "programa" o "plugin"
    - imagen:  (opcional) ruta al icono, p. ej. "icon-camlibre.png". Si no, usa el emoji.
    - version: versión actual (si hay una Release en GitHub, se usa la de GitHub)
@@ -181,7 +181,7 @@ const PRODUCTOS = [
     nombre: "CamLibre",
     tipo: "programa",
     descripcion: "Cámara con avatar 3D para tus directos y vídeos. Añádela a OBS y dale vida a tu stream sin webcam.",
-    repo: "camlibre",
+    repo: "camlibre-descargas",
     archivo: "CamLibre-Setup.exe",
     icono: "🎥",
     imagen: "icon-camlibre.png",
@@ -194,7 +194,7 @@ const PRODUCTOS = [
     nombre: "Twitch Activity",
     tipo: "programa",
     descripcion: "Muestra en pantalla la actividad de tu canal de Twitch durante el directo.",
-    repo: "twitch-activity",
+    repo: "twitchactivity-descargas",
     archivo: "TwitchActivity-Setup.exe",
     icono: "💜",
     imagen: "icon-twitchactivity.png",
@@ -207,7 +207,7 @@ const PRODUCTOS = [
     nombre: "TransitionRandom",
     tipo: "plugin",
     descripcion: "Transiciones aleatorias entre escenas para que tu directo nunca se vea igual.",
-    repo: "transition-random",
+    repo: "transitionrandom-descargas",
     archivo: "TransitionRandom.zip",
     icono: "🎲",
     imagen: "icon-transitionrandom.png",
@@ -296,7 +296,8 @@ const PRODUCTOS = [
        <span class="ico">${r.ico}</span><span class="txt">${r.nombre}</span></a>`).join("");
   ["#navSocial", "#heroSocial", "#footSocial"].forEach(s => $(s).innerHTML = botones);
 
-  const descarga = p => p.url || `https://github.com/${CONFIG.github}/${p.repo}/releases/latest/download/${p.archivo}`;
+  // El botón apunta a la página de versiones y, en cuanto GitHub responde, al instalador de la última versión
+  const descarga = p => p.url || `https://github.com/${CONFIG.github}/${p.repo}/releases/latest`;
   const versiones = p => `https://github.com/${CONFIG.github}/${p.repo}/releases`;
 
   function tarjeta(p, i){
@@ -317,7 +318,7 @@ const PRODUCTOS = [
         <span>Descargas: <b id="d${i}">${configurado ? "…" : "—"}</b></span>
       </div>
       <div class="actions">
-        <a class="btn" href="${esc(descarga(p))}">⬇ Descargar</a>${tut}${hist}
+        <a class="btn" id="b${i}" href="${esc(descarga(p))}">⬇ Descargar</a>${tut}${hist}
       </div>
     </article>`;
   }
@@ -333,6 +334,9 @@ const PRODUCTOS = [
         .then(rel => {
           const ultima = rel.find(r => !r.draft && !r.prerelease) || rel[0];
           if (ultima) {
+            const assets = ultima.assets || [];
+            const a = assets.find(x => x.name === p.archivo) || assets.find(x => /\.(exe|msi|zip)$/i.test(x.name)) || assets[0];
+            if (a) $("#b"+i).href = a.browser_download_url;
             $("#v"+i).textContent = ultima.tag_name; $("#v"+i).classList.remove("soon");
             $("#f"+i).textContent = new Date(ultima.published_at).toLocaleDateString("es-ES");
           }
