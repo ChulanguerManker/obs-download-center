@@ -105,7 +105,12 @@
   .top{display:flex;gap:14px;align-items:center}
   .icon{width:54px;height:54px;flex:none;border-radius:14px;display:grid;place-items:center;font-size:1.6rem;
     background:color-mix(in srgb,var(--accent) 20%,transparent);border:1px solid color-mix(in srgb,var(--accent) 50%,transparent)}
-  .icon img{width:100%;height:100%;object-fit:cover;border-radius:13px}
+  .icon img{width:100%;height:100%;object-fit:contain}
+  .icon.has-img{background:none;border:none;filter:drop-shadow(0 0 10px color-mix(in srgb,var(--accent) 45%,transparent))}
+  .card h3{display:flex;align-items:center;flex-wrap:wrap;gap:8px}
+  .vbadge{font:700 .78rem Inter,sans-serif;letter-spacing:.3px;padding:2px 8px;border-radius:999px;
+    color:var(--ok);background:rgba(52,211,153,.12);border:1px solid rgba(52,211,153,.4)}
+  .vbadge.soon{color:var(--warn);background:rgba(251,191,36,.12);border-color:rgba(251,191,36,.4)}
   .card h3{font-family:Rajdhani,sans-serif;font-size:1.45rem;font-weight:700;line-height:1.1}
   .type{font:600 .72rem Rajdhani,sans-serif;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent)}
   .desc{color:var(--muted);font-size:.94rem;flex:1}
@@ -166,7 +171,8 @@ const CONFIG = {
    - repo:    nombre del repositorio en GitHub donde subes las versiones (Releases)
    - archivo: nombre EXACTO del .exe/.zip que subes en cada versión (usa siempre el mismo)
    - tipo:    "programa" o "plugin"
-   - imagen:  (opcional) ruta a un icono, p. ej. "img/camlibre.png". Si no, usa el emoji.
+   - imagen:  (opcional) ruta al icono, p. ej. "icon-camlibre.png". Si no, usa el emoji.
+   - version: versión actual (si hay una Release en GitHub, se usa la de GitHub)
    - url:     (opcional) enlace de descarga propio si no usas GitHub Releases
    - tutorial:(opcional) enlace a un vídeo tutorial
 */
@@ -178,6 +184,8 @@ const PRODUCTOS = [
     repo: "camlibre",
     archivo: "CamLibre-Setup.exe",
     icono: "🎥",
+    imagen: "icon-camlibre.png",
+    version: "v1.5.9",
     color: "#8b5cf6",
     etiquetas: ["Windows", "Avatar 3D", "OBS"],
     tutorial: ""
@@ -189,6 +197,8 @@ const PRODUCTOS = [
     repo: "twitch-activity",
     archivo: "TwitchActivity-Setup.exe",
     icono: "💜",
+    imagen: "icon-twitchactivity.png",
+    version: "",
     color: "#a855f7",
     etiquetas: ["Windows", "Twitch", "Overlay"],
     tutorial: ""
@@ -200,6 +210,8 @@ const PRODUCTOS = [
     repo: "transition-random",
     archivo: "TransitionRandom.zip",
     icono: "🎲",
+    imagen: "icon-transitionrandom.png",
+    version: "",
     color: "#22d3ee",
     etiquetas: ["OBS", "Transiciones"],
     tutorial: ""
@@ -295,13 +307,13 @@ const PRODUCTOS = [
     return `
     <article class="card" style="--accent:${esc(p.color || "#8b5cf6")}" data-tipo="${esc(p.tipo)}" data-txt="${esc((p.nombre+" "+p.descripcion+" "+(p.etiquetas||[]).join(" ")).toLowerCase())}">
       <div class="top">
-        <div class="icon">${icono}</div>
-        <div><div class="type">${p.tipo === "plugin" ? "Plugin OBS" : "Programa"}</div><h3>${esc(p.nombre)}</h3></div>
+        <div class="icon${p.imagen ? " has-img" : ""}">${icono}</div>
+        <div><div class="type">${p.tipo === "plugin" ? "Plugin OBS" : "Programa"}</div><h3>${esc(p.nombre)}<span class="vbadge${p.version ? "" : " soon"}" id="v${i}">${esc(p.version || "Próximamente")}</span></h3></div>
       </div>
       <p class="desc">${esc(p.descripcion)}</p>
       <div class="chips">${chips}</div>
       <div class="meta">
-        <span>Versión: <b class="ver" id="v${i}">${configurado ? "…" : "—"}</b></span>
+        <span>Actualizado: <b id="f${i}">—</b></span>
         <span>Descargas: <b id="d${i}">${configurado ? "…" : "—"}</b></span>
       </div>
       <div class="actions">
@@ -315,16 +327,19 @@ const PRODUCTOS = [
   // Versión y número de descargas en directo desde GitHub
   if (configurado){
     PRODUCTOS.forEach((p, i) => {
-      if (p.url) { $("#v"+i).textContent = "—"; $("#d"+i).textContent = "—"; return; }
+      if (p.url) { $("#d"+i).textContent = "—"; return; }
       fetch(`https://api.github.com/repos/${CONFIG.github}/${p.repo}/releases`)
         .then(r => r.ok ? r.json() : Promise.reject())
         .then(rel => {
           const ultima = rel.find(r => !r.draft && !r.prerelease) || rel[0];
-          $("#v"+i).textContent = ultima ? ultima.tag_name : "sin publicar";
+          if (ultima) {
+            $("#v"+i).textContent = ultima.tag_name; $("#v"+i).classList.remove("soon");
+            $("#f"+i).textContent = new Date(ultima.published_at).toLocaleDateString("es-ES");
+          }
           const total = rel.reduce((s, r) => s + (r.assets || []).reduce((a, x) => a + x.download_count, 0), 0);
           $("#d"+i).textContent = total.toLocaleString("es-ES");
         })
-        .catch(() => { $("#v"+i).textContent = "próximamente"; $("#d"+i).textContent = "—"; });
+        .catch(() => { $("#d"+i).textContent = "—"; });
     });
   }
 
