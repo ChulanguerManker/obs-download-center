@@ -82,6 +82,10 @@
     -webkit-background-clip:text;background-clip:text;color:transparent;
     text-shadow:0 0 40px rgba(139,92,246,.35)}
   .hero p{color:var(--muted);max-width:600px;margin:16px auto 0;font-size:1.05rem}
+  .visits{display:inline-flex;align-items:center;gap:8px;margin-top:22px;padding:6px 14px;border-radius:999px;
+    background:var(--card);border:1px solid var(--line);color:var(--muted);font-size:.9rem}
+  .visits svg{width:18px;height:18px;color:var(--neon2)}
+  .visits b{color:var(--text);font-family:Rajdhani,sans-serif;font-size:1.05rem;letter-spacing:.5px}
 
   /* Filtros */
   .tools{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center;margin:24px 0 22px}
@@ -178,7 +182,10 @@ const CONFIG = {
   twitch:   "https://www.twitch.tv/chulanguermanker",
   youtube:  "https://www.youtube.com/@chulanguer_manker",
   discord:  "https://discord.gg/JRjRzsbsus",
-  tiktok:   "https://www.tiktok.com/@chulanguermanker"
+  tiktok:   "https://www.tiktok.com/@chulanguermanker",
+
+  // Contador de visitas (servicio gratuito Abacus, sin cuenta). Pon false para ocultarlo.
+  contador: true
 };
 
 /* Tus programas y plugins.
@@ -293,6 +300,7 @@ const PRODUCTOS = [
     <h1 data-i18n="title">Centro de <span>Descargas</span></h1>
     <p data-i18n="intro">Programas y plugins para OBS hechos por <b class="nm"></b>. Descarga siempre la última versión con un clic.</p>
     <div class="socials" id="heroSocial"></div>
+    <div class="visits" id="visits" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg><b id="visitsN"></b> <span data-i18n="visits">visitas</span></div>
   </section>
 
   <div class="tools">
@@ -348,6 +356,7 @@ const PRODUCTOS = [
       ctaText: "Avisos de nuevas versiones, soporte y sugerencias para los próximos programas.",
       ctaBtn: "Entrar al Discord",
       hosted: "Alojado gratis en",
+      visits: "visitas",
       locale: "es-ES"
     },
     en: {
@@ -366,6 +375,7 @@ const PRODUCTOS = [
       ctaText: "New version announcements, support and suggestions for upcoming programs.",
       ctaBtn: "Join the Discord",
       hosted: "Hosted for free on",
+      visits: "visits",
       locale: "en-GB"
     }
   };
@@ -451,9 +461,28 @@ const PRODUCTOS = [
     $$(".nm").forEach(el => el.textContent = CONFIG.nombre);
     $("#q").placeholder = t.search; $("#q").setAttribute("aria-label", t.search);
     $$(".lang button").forEach(b => b.classList.toggle("on", b.dataset.lang === l));
+    if (visitas != null) $("#visitsN").textContent = visitas.toLocaleString(t.locale);
     pintar();
   }
   $$(".lang button").forEach(b => b.addEventListener("click", () => idioma(b.dataset.lang)));
+
+  // Contador de visitas: suma 1 por sesión del navegador (recargar no cuenta) y muestra el total
+  let visitas = null;
+  if (CONFIG.contador) {
+    const ns = (CONFIG.github || "web").toLowerCase() + "-github-io", key = "obs-download-center";
+    let contada = false;
+    try { contada = sessionStorage.getItem("visitaContada") === "1"; } catch (e) {}
+    fetch(`https://abacus.jasoncameron.dev/${contada ? "get" : "hit"}/${ns}/${key}`)
+      .then(r => r.ok ? r.json() : Promise.reject(r.status))
+      .then(d => {
+        if (typeof d.value !== "number") return;
+        try { sessionStorage.setItem("visitaContada", "1"); } catch (e) {}
+        visitas = d.value;
+        $("#visitsN").textContent = visitas.toLocaleString(TXT[lang].locale);
+        $("#visits").hidden = false;
+      })
+      .catch(() => {});   // si el servicio falla, el contador simplemente no aparece
+  }
 
   // Filtros y buscador
   let filtro = "todos";
