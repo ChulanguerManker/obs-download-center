@@ -510,7 +510,7 @@ const PRODUCTOS = [
       const panel = $("#statsPanel"), abrir = panel.hidden;
       panel.hidden = !abrir;
       $("#statsTab").setAttribute("aria-expanded", String(abrir));
-      if (abrir && !$("#statsFrame").src) $("#statsFrame").src = CONFIG.estadisticas;
+      if (abrir && !$("#statsFrame").src) $("#statsFrame").src = CONFIG.estadisticas + (CONFIG.estadisticas.includes("?") ? "&" : "?") + "t=" + Date.now();  // evita que el navegador use una copia vieja
       if (abrir) panel.scrollIntoView({ behavior: "smooth", block: "start" });
     });
   }
