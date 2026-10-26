@@ -66,8 +66,10 @@
   .social.youtube{--c:#FF0033}
   .social.discord{--c:#5865F2}
   .social.tiktok{--c:#25F4EE}
+  .social.paypal{--c:#0070BA}
   .nav-links .social{padding:7px 12px;font-size:.85rem;border-radius:10px}
   .nav-links .social .txt{display:none}
+  .nav-links .social.paypal .txt{display:inline}
   footer .socials{margin:0 0 12px}
   footer .social{padding:8px 14px;font-size:.85rem}
 
@@ -189,6 +191,7 @@ const CONFIG = {
   youtube:  "https://www.youtube.com/@chulanguer_manker",
   discord:  "https://discord.gg/JRjRzsbsus",
   tiktok:   "https://www.tiktok.com/@chulanguermanker",
+  paypal:   "https://www.paypal.com/donate/?business=chulanguermanker%40gmail.com&no_recurring=0&currency_code=EUR",   // Botón de donar
 
   // Contador de visitas (servicio gratuito Abacus, sin cuenta). Pon false para ocultarlo.
   contador: true,
@@ -385,6 +388,7 @@ const PRODUCTOS = [
       ctaText: "Avisos de nuevas versiones, soporte y sugerencias para los próximos programas.",
       ctaBtn: "Entrar al Discord",
       hosted: "Alojado gratis en",
+      donate: "Donar",
       visits: "visitas",
       stats: "Estadísticas", statsOpen: "Abrir en grande ↗",
       locale: "es-ES"
@@ -405,6 +409,7 @@ const PRODUCTOS = [
       ctaText: "New version announcements, support and suggestions for upcoming programs.",
       ctaBtn: "Join the Discord",
       hosted: "Hosted for free on",
+      donate: "Donate",
       visits: "visits",
       stats: "Stats", statsOpen: "Open full size ↗",
       locale: "en-GB"
@@ -434,11 +439,12 @@ const PRODUCTOS = [
     { k: "twitch",  nombre: "Twitch",  ico: "🎮" },
     { k: "youtube", nombre: "YouTube", ico: "▶" },
     { k: "discord", nombre: "Discord", ico: "💬" },
-    { k: "tiktok",  nombre: "TikTok",  ico: "🎵" }
+    { k: "tiktok",  nombre: "TikTok",  ico: "🎵" },
+    { k: "paypal",  nombre: "PayPal",  ico: "💙", i18n: "donate" }
   ].filter(r => CONFIG[r.k]);
   const botones = REDES.map(r =>
     `<a class="social ${r.k}" href="${esc(CONFIG[r.k])}" target="_blank" rel="noopener" title="${r.nombre}">
-       <span class="ico">${r.ico}</span><span class="txt">${r.nombre}</span></a>`).join("");
+       <span class="ico">${r.ico}</span><span class="txt"${r.i18n ? ` data-i18n="${r.i18n}"` : ""}>${r.nombre}</span></a>`).join("");
   ["#navSocial", "#heroSocial", "#footSocial"].forEach(s => $(s).innerHTML = botones);
 
   // Datos de GitHub (se guardan para poder cambiar de idioma sin volver a pedirlos)
