@@ -567,7 +567,8 @@ const PRODUCTOS = [
             const a = assets.find(x => x.name === p.archivo) || assets.find(x => /\.(exe|msi|zip)$/i.test(x.name)) || assets[0];
             if (a) info[i].url = a.browser_download_url;
             info[i].tag = ultima.tag_name;
-            info[i].fecha = ultima.published_at;
+            // Fecha del instalador más reciente (si se sustituye el .exe en la misma versión, se ve la fecha nueva)
+            info[i].fecha = assets.reduce((m, x) => x.updated_at > m ? x.updated_at : m, ultima.published_at);
           }
           info[i].total = rel.reduce((s, r) => s + (r.assets || []).reduce((a, x) => a + x.download_count, 0), 0);
         })
