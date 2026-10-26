@@ -207,6 +207,7 @@ const CONFIG = {
    - imagen:  (opcional) ruta al icono, p. ej. "icon-camlibre.png". Si no, usa el emoji.
    - version: versión actual (si hay una Release en GitHub, se usa la de GitHub)
    - url:     (opcional) enlace de descarga propio si no usas GitHub Releases
+   - fecha:   (opcional, con url) fecha de la versión, p. ej. "2026-10-26"
    - tutorial:(opcional) enlace a un vídeo tutorial
    - descripcion_en / etiquetas_en: textos en inglés (si faltan, se usan los de español)
 */
@@ -262,6 +263,8 @@ const PRODUCTOS = [
     descripcion_en: "Change your voice live from a panel in OBS: woman, kid, ghost, robot and 19 more voices, no plug-ins needed. Your viewers can change it too with SAMMI, Stream Deck or rewards.",
     repo: "streamervoice-descargas",
     archivo: "StreamerVoice-Setup.exe",
+    url: "https://github.com/ChulanguerManker/streamervoice-descargas/raw/main/StreamerVoice-Setup.exe",
+    fecha: "2026-10-26",
     icono: "🎤",
     imagen: "icon-streamervoice.png",
     version: "v0.8.0",
@@ -463,7 +466,7 @@ const PRODUCTOS = [
     const tut = p.tutorial ? `<a class="btn ghost" href="${esc(p.tutorial)}" target="_blank" rel="noopener" title="${t.tutorial}">▶</a>` : "";
     const hist = p.url ? "" : `<a class="btn ghost" href="${esc(versiones(p))}" target="_blank" rel="noopener" title="${t.history}">⟲</a>`;
     const ver = d.tag || p.version;
-    const fecha = d.fecha ? new Date(d.fecha).toLocaleDateString(t.locale) : "—";
+    const fecha = (d.fecha || p.fecha) ? new Date(d.fecha || p.fecha).toLocaleDateString(t.locale) : "—";
     const total = d.total != null ? d.total.toLocaleString(t.locale) : (configurado && !p.url && !d.error ? "…" : "—");
     return `
     <article class="card" style="--accent:${esc(p.color || "#8b5cf6")}" data-tipo="${esc(p.tipo)}" data-txt="${esc([p.nombre, p.descripcion, p.descripcion_en, ...(p.etiquetas||[]), ...(p.etiquetas_en||[])].join(" ").toLowerCase())}">
