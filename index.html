@@ -218,7 +218,7 @@ const PRODUCTOS = [
     descripcion: "Cámara con avatar 3D para tus directos y vídeos. Añádela a OBS y dale vida a tu stream sin webcam.",
     descripcion_en: "3D avatar camera for your streams and videos. Add it to OBS and bring your stream to life without a webcam.",
     repo: "camlibre-descargas",
-    archivo: "CamLibre-Setup.exe",
+    archivo: "CamLibre-Setup-1.7.1.exe",
     icono: "🎥",
     imagen: "icon-camlibre.png",
     version: "v1.7.1",
@@ -292,7 +292,7 @@ const PRODUCTOS = [
     descripcion: "Un punto siempre visible en tu pantalla, incluso jugando: rojo si tu micro está muteado en OBS y verde si está abierto. Se abre y se cierra con OBS, y puedes ajustar tamaño, posición y colores.",
     descripcion_en: "An always-on-top dot on your screen, even while gaming: red when your mic is muted in OBS, green when it's live. Opens and closes with OBS, with adjustable size, position and colors.",
     repo: "micdot-descargas",
-    archivo: "MicDot-Setup.exe",
+    archivo: "MicDot-Setup.1.1.0.exe",
     icono: "🔴",
     imagen: "icon-micdot.png",
     version: "v1.1.0",
@@ -450,7 +450,7 @@ const PRODUCTOS = [
 
   // Datos de GitHub (se guardan para poder cambiar de idioma sin volver a pedirlos)
   const info = PRODUCTOS.map(() => ({}));
-  const descarga = (p, i) => info[i].url || p.url || `https://github.com/${CONFIG.github}/${p.repo}/releases/latest`;
+  const descarga = (p, i) => info[i].url || p.url || (p.archivo ? `https://github.com/${CONFIG.github}/${p.repo}/releases/latest/download/${p.archivo}` : `https://github.com/${CONFIG.github}/${p.repo}/releases/latest`);
   const versiones = p => `https://github.com/${CONFIG.github}/${p.repo}/releases`;
   const textos = p => ({
     desc: (lang === "en" && p.descripcion_en) || p.descripcion,
