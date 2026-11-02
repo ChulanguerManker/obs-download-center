@@ -135,6 +135,11 @@
   .btn.ghost:hover{color:var(--text);border-color:var(--accent);box-shadow:none}
   .empty{grid-column:1/-1;text-align:center;color:var(--muted);padding:40px}
 
+  /* Programas aún no lanzados */
+  .btn.locked{background:var(--bg2);color:var(--muted);border:1px dashed var(--line);cursor:not-allowed}
+  .btn.locked:hover{filter:none;box-shadow:none}
+  .card.locked .icon{opacity:.6;filter:grayscale(.7)}
+
   /* Bloque Discord */
   .cta{margin:10px 0 60px;padding:32px;border-radius:20px;text-align:center;
     background:linear-gradient(135deg,rgba(88,101,242,.25),rgba(139,92,246,.15));border:1px solid rgba(88,101,242,.45)}
@@ -182,6 +187,12 @@
    CONFIGURACIÓN — solo tienes que editar esta parte
    ===================================================================== */
 const CONFIG = {
+  // LANZAMIENTOS: solo se pueden descargar los programas de esta lista.
+  // Para desbloquear uno, añade su nombre tal cual aparece abajo, por ejemplo:
+  // disponibles: ["CamLibre", "MicDot"],
+  // Los demás salen con el botón "Próximamente" / "Coming soon".
+  disponibles: ["MicDot"],
+
   nombre:   "Chulanguermanker",                       // Tu nombre o marca
   github:   "chulanguermanker",              // Tu usuario de GitHub
   logo:     "logo.png",                           // Tu icono de patata (si no está, sale 🥔)
@@ -385,6 +396,8 @@ const PRODUCTOS = [
   const $$ = s => document.querySelectorAll(s);
   const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
   const configurado = CONFIG.github && CONFIG.github !== "TUUSUARIO";
+  const bloqueado = p => !CONFIG.disponibles.includes(p.nombre);
+  PRODUCTOS.sort((a, b) => bloqueado(a) - bloqueado(b));   // Los disponibles, siempre primero
 
   /* ---------- Textos en español e inglés ---------- */
   const TXT = {
@@ -473,28 +486,30 @@ const PRODUCTOS = [
   });
 
   function tarjeta(p, i){
-    const t = TXT[lang], d = info[i], tx = textos(p);
+    const t = TXT[lang], d = info[i], tx = textos(p), lock = bloqueado(p);
     const icono = p.imagen ? `<img src="${esc(p.imagen)}" alt="">` : esc(p.icono || "📦");
     const chips = tx.tags.map(x => `<span class="chip">${esc(x)}</span>`).join("");
     const tut = p.tutorial ? `<a class="btn ghost" href="${esc(p.tutorial)}" target="_blank" rel="noopener" title="${t.tutorial}">▶</a>` : "";
     const hist = p.url ? "" : `<a class="btn ghost" href="${esc(versiones(p))}" target="_blank" rel="noopener" title="${t.history}">⟲</a>`;
-    const ver = d.tag || p.version;
+    const ver = lock ? "" : d.tag || p.version;
     const fecha = (d.fecha || p.fecha) ? new Date(d.fecha || p.fecha).toLocaleDateString(t.locale) : "—";
     const total = d.total != null ? d.total.toLocaleString(t.locale) : (configurado && !p.url && !d.error ? "…" : "—");
     return `
-    <article class="card" style="--accent:${esc(p.color || "#8b5cf6")}" data-tipo="${esc(p.tipo)}" data-txt="${esc([p.nombre, p.descripcion, p.descripcion_en, ...(p.etiquetas||[]), ...(p.etiquetas_en||[])].join(" ").toLowerCase())}">
+    <article class="card${lock ? " locked" : ""}" style="--accent:${esc(p.color || "#8b5cf6")}" data-tipo="${esc(p.tipo)}" data-txt="${esc([p.nombre, p.descripcion, p.descripcion_en, ...(p.etiquetas||[]), ...(p.etiquetas_en||[])].join(" ").toLowerCase())}">
       <div class="top">
         <div class="icon${p.imagen ? " has-img" : ""}">${icono}</div>
         <div><div class="type">${p.tipo === "plugin" ? t.plugin : t.program}</div><h3>${esc(p.nombre)}<span class="vbadge${ver ? "" : " soon"}">${esc(ver || t.soon)}</span></h3></div>
       </div>
       <p class="desc">${esc(tx.desc)}</p>
       <div class="chips">${chips}</div>
-      <div class="meta">
+      ${lock ? "" : `<div class="meta">
         <span>${t.updated}: <b>${fecha}</b></span>
         <span>${t.downloads}: <b>${total}</b></span>
-      </div>
+      </div>`}
       <div class="actions">
-        <a class="btn" href="${esc(descarga(p, i))}">${t.download}</a>${tut}${hist}
+        ${lock
+          ? `<button class="btn locked" type="button" disabled>🔒 ${t.soon}</button>`
+          : `<a class="btn" href="${esc(descarga(p, i))}">${t.download}</a>${tut}${hist}`}
       </div>
     </article>`;
   }
@@ -572,7 +587,7 @@ const PRODUCTOS = [
   // Versión, fecha, descargas e instalador en directo desde GitHub
   if (configurado){
     PRODUCTOS.forEach((p, i) => {
-      if (p.url) return;
+      if (p.url || bloqueado(p)) return;
       fetch(`https://api.github.com/repos/${CONFIG.github}/${p.repo}/releases`)
         .then(r => r.ok ? r.json() : Promise.reject())
         .then(rel => {
